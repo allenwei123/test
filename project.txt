@@ -1,0 +1,14 @@
+angular-animate
+angular-cookie ipCookie(key, value, { expires: 21 });
+angular-load-bar  加载进度条
+angular-toastr  弹出框
+angularjs-dropdown-multiselect 多选菜单
+
+ng-pagination  <page-pagination  //页码
+   		 page-id="pageId"
+   		 page-record="recordCount"
+   		 page-url-template="urlTemplate">
+		</page-pagination>
+
+ngVerify  https://segmentfault.com/a/1190000006612247  表单认证
+lclazyload http://www.cnblogs.com/snandy/archive/2011/04/30/2033272.html
