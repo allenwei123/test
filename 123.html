@@ -16,7 +16,7 @@
     </form>
 
 
-		 <input type="file" onchange="document.getElementById('img').src=getFullPath(this);" /> 
+	44564556	 <input type="file" onchange="document.getElementById('img').src=getFullPath(this);" />
          <img id="img" />
 
 
@@ -27,10 +27,11 @@
    	var that = this;
    	 console.log(that.files[0])
    	 var img = document.getElementById("img");
-   	 img.src = that.files[0].name
+   	 img.src = that.files
+       [0].name
    }
+    function getFullPath(obj)      {
 
-    function getFullPath(obj)      { 
  			if(obj){ 
 				return obj.value; 
 		    } 
