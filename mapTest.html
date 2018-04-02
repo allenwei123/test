@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.4&key=3320d9b941fd7c34bb95168824059803"></script>
+    <!-- &plugin=AMap.Autocomplete -->
+    <script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+    <title>map</title>
+</head>
+
+<body>
+    <div id="container" style="width:500px; height:300px"></div>
+    <input type="text" id="tipinput">
+</body>
+
+
+<script>
+    // window.my_init = function () {
+    var map, geolocation;
+    //   map.plugin('AMap.Geolocation', function () {
+    //     geolocation = new AMap.Geolocation({
+    //       enableHighAccuracy: true,
+    //       timeout: 10000
+    //     });
+    //     geolocation.getCurrentPosition();
+    //     AMap.event.addListener(geolocation, 'complete', data => {
+    //       console.log('经度：' + data.position.getLng());
+    //     });//返回定位信息
+    //   })
+    // }
+    map = new AMap.Map('container', {
+        resizeEnable: true,
+        zoom: 16,
+        icon: true
+    });
+
+    marker = new AMap.Marker({ draggable: true });
+    marker.setMap(map);
+
+
+
+    map.plugin(["AMap.ToolBar"], function () {
+        map.addControl(new AMap.ToolBar());
+
+        map.on('click', function (e) {
+            map.setCenter([e.lnglat.getLng(), e.lnglat.getLat()]);//设置视图中心
+
+            AMap.service("AMap.Geocoder", function () {
+                var geo = new AMap.Geocoder();
+                geo.getAddress([e.lnglat.getLng(), e.lnglat.getLat()], function (status, result) {
+                    if (status === 'complete' && result.info === 'OK') {
+                        var address = result.regeocode.formattedAddress; //返回地址描述
+                        marker.setPosition([e.lnglat.getLng(), e.lnglat.getLat()]);//设置标注
+                        marker.setTitle(address);//设置标注提示
+                            tipinput.value = "";
+                            tipinput.value = address;
+                    }
+                })
+            })
+        });
+        AMap.service("AMap.Autocomplete", function () {
+            var auto = new AMap.Autocomplete({
+                input: "tipinput"
+            });
+            AMap.event.addListener(auto, "select", select);//注册监听，当选中某条记录时会触发
+            function select(e) {
+                if (e.poi && e.poi.location) {
+                    map.setZoom(15);
+                    map.setCenter(e.poi.location);
+
+                    marker.setPosition([e.poi.location.lng, e.poi.location.lat]);//设置标注
+                    marker.setTitle(e.poi.name);//设置标注提示
+                }
+            }
+        })
+
+        //路线类
+        // var drving = new AMap.Driving({
+        //     map: map
+        // })
+        // drving.search([
+        //     { keyword: '北京西站', city: '北京' },
+        //     { keyword: '北京故宫', city: '北京' }
+        // ]);
+
+
+
+    });
+
+</script>
+
+</html>
