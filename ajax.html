@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>自定义AJax </title>
+</head>
+
+<body>
+    可以添加拦截的Ajax
+</body>
+<script>
+    function $HJax() {
+        var config = arguments[0];
+        this.config = config;
+        this.req = { headers: {}, url: '' };
+        this.ab = null;
+
+    }
+
+    $HJax.prototype.request = function (fn) {
+        if (!this.ab) {
+            this.ab = fn;
+        }
+        if (fn) {
+            this.req = fn(this.req);
+        }
+    }
+
+    $HJax.prototype.get = function (url, obj) {
+        var hhttp;
+        if (window.XMLHttpRequest) {
+            hhttp = new XMLHttpRequest();
+        }
+        else {
+            hhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        this.req['parm'] = obj;
+        var conf = deepClone(this.req);
+        conf.url = this.config.baseURL + url;
+        let newConfig = this.ab(conf, true);
+        var uri = newConfig.url + urlFormatch(newConfig.parm, true);
+        hhttp.open('GET', uri, true);
+        setHeader(hhttp, newConfig.headers);
+
+        return new Promise(function (resolve, reject) {
+            try {
+                hhttp.onreadystatechange = function () {
+                    if (hhttp.readyState == 4 && hhttp.status == 200 || hhttp.status == 304) {
+                        resolve(JSON.parse(hhttp.responseText));
+                    } else if (hhttp.status == 404 && hhttp.readyState == 4) {
+                        reject(JSON.parse(hhttp.responseText))
+                    }
+                };
+                hhttp.send();
+            } catch (error) {
+                reject(error)
+            }
+        })
+
+
+    };
+
+    $HJax.prototype.post = function (url, obj) {
+        var hhttp;
+        if (window.XMLHttpRequest) {
+            hhttp = new XMLHttpRequest();
+        }
+        else {
+            hhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        this.req['body'] = obj;
+        var conf = deepClone(this.req);
+        conf.url = this.config.baseURL + url;
+        let newConfig = this.ab(conf, true);
+        var uri = newConfig.url;
+        hhttp.open('POST', uri, true);
+        setHeader(hhttp, newConfig.headers);
+
+        return new Promise(function (resolve, reject) {
+            try {
+                hhttp.onreadystatechange = function () {
+                    if (hhttp.readyState == 4 && hhttp.status == 200 || hhttp.status == 304) {
+                        resolve(JSON.parse(hhttp.responseText));
+                    } else if (hhttp.status == 404 && hhttp.readyState == 4) {
+                        reject(JSON.parse(hhttp.responseText))
+                    }
+                };
+                hhttp.send(JSON.stringify(newConfig.body));
+            } catch (error) {
+                reject(error);
+            }
+        });
+
+    }
+    $HJax.prototype.put = function (url, obj) {
+        var hhttp;
+        if (window.XMLHttpRequest) {
+            hhttp = new XMLHttpRequest();
+        }
+        else {
+            hhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        this.req['body'] = obj;
+        var conf = deepClone(this.req);
+        conf.url = this.config.baseURL + url;
+        let newConfig = this.ab(conf, true);
+        var uri = newConfig.url;
+        hhttp.open('PUT', uri, true);
+        setHeader(hhttp, newConfig.headers);
+
+        return new Promise(function (resolve, reject) {
+            try {
+                hhttp.onreadystatechange = function () {
+                    if (hhttp.readyState == 4 && hhttp.status == 200 || hhttp.status == 304) {
+                        resolve(JSON.parse(hhttp.responseText));
+                    } else if (hhttp.status == 404 && hhttp.readyState == 4) {
+                        reject(JSON.parse(hhttp.responseText))
+                    }
+                };
+                hhttp.send(JSON.stringify(newConfig.body));
+            } catch (error) {
+                reject(error);
+            }
+        });
+
+    }
+
+
+
+
+
+    /**
+    *@author allenwei123
+    * 初始化 new $HJax();
+    **/ 
+    var http = new $HJax({ baseURL: 'http://apismcm.test.bitiot.com.cn/v1/' });
+
+    /***
+        自定义拦截 
+        可修改 header body parms url 
+    ***/ 
+    http.request((config, bool) => {
+        config.headers['Content-Type'] = 'application/json';
+        config.headers['OS'] = '3';
+        config.headers['OS-VERSION'] = '3';
+        config.headers['DEVICE-ID'] = 'h5';
+        config.headers['DEVICE-TYPE'] = 'h5';
+        config.headers['PUSH-ID'] = '10086';
+        config.headers['CLIENT'] = '1002';
+        return config;
+    });
+
+    // http.get('/statistics/5a82adf3b06c97e0cd6c0f3d/room', { name: '胡', age: 12 }).then(res => {
+    //     console.log(res)
+    // }).catch(err => {
+    //     console.log(err)
+    // })
+
+    http.get('/statistics/5a82adf3b06c97e0cd6c0f3d/room1', { name: '11胡', age: 1222 }).then(res => {
+        console.log(res)
+    }).catch(err => {
+        console.log(err)
+    })
+
+
+    http.post('stat', { name: 'allen' }).then(res => {
+        console.log(res)
+    }).catch(err => {
+        console.log(err)
+    })
+
+    function urlFormatch() {
+        var obj = arguments[0];
+        var bool = arguments[1];
+        var str = '';
+        var count = 0;
+        for (var key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                var value = obj[key];
+                if (bool) {
+                    str += ((count == 0) ? '?' : '&') + key + '=' + value;
+                } else {
+                    str += ((count == 0) ? '' : '&') + key + '=' + value;
+                }
+            }
+            count++;
+        }
+        return encodeURI(str);
+    }
+    function deepClone(data) {
+        var type = getType(data);
+        var obj;
+        if (type === 'array') {
+            obj = [];
+        } else if (type === 'object') {
+            obj = {};
+        } else {
+            //不再具有下一层次
+            return data;
+        }
+        if (type === 'array') {
+            for (var i = 0, len = data.length; i < len; i++) {
+                obj.push(deepClone(data[i]));
+            }
+        } else if (type === 'object') {
+            for (var key in data) {
+                obj[key] = deepClone(data[key]);
+            }
+        }
+        return obj;
+    }
+    function getType(data) {
+        return typeof data;
+    }
+    function setHeader(xm, data) {
+        var type = getType(data);
+        if (type === 'object') {
+            for (var key in data) {
+                if (data.hasOwnProperty(key)) {
+                    var value = data[key];
+                    xm.setRequestHeader(key, value);
+                }
+            }
+        }
+        return xm;
+    }
+
+
+
+</script>
+
+</html>
