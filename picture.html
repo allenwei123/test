@@ -34,7 +34,7 @@
             var Devicestate = navigator.mediaDevices.getUserMedia({
                 video: true
             })
-
+    console.log('hu1')
 
             Devicestate.then(function (mediaStream) {
                 video.src = window.URL.createObjectURL(mediaStream);
