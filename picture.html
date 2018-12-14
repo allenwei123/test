@@ -32,11 +32,14 @@
         $('#rec').click(function () {
             //视频获取
             var Devicestate = navigator.mediaDevices.getUserMedia({
-                video: true
+                video: true,
+                optional: [ // 对视频Track的可选约束条件
+                    { frameRate: 30 }
+                ]
             })
-    console.log('hu1')
 
             Devicestate.then(function (mediaStream) {
+                // video.src = window.URL.createObjectURL(mediaStream);
                 video.src = window.URL.createObjectURL(mediaStream);
                 MediaStream1 = typeof mediaStream.stop === 'function' ? mediaStream : mediaStream.getTracks()[0];
 
