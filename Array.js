@@ -6,6 +6,7 @@ Array.prototype.justMatch = function(fn){
           let item = fn(arrObj[i],i);
           if(item){
             newArr.push(item);
+                //dev
           }
         }
       }
