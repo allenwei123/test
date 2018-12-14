@@ -6,8 +6,10 @@ Array.prototype.justMatch = function(fn){
           let item = fn(arrObj[i],i);
           if(item){
             newArr.push(item);
+                //dev
           }
         }
       }
+      console.log('本地dev修改数据')
       return newArr;
     }
